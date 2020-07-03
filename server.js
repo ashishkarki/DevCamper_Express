@@ -1,6 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const colors = require('colors')
+const errorHandler = require('./middleware/error')
 
 const dotenv = require('dotenv')
 const connectDB = require('./config/db')
@@ -26,6 +27,9 @@ if (process.env.NODE_ENV === 'development') {
 
 // Mount routers
 app.use('/api/v1/bootcamps', bootcamps)
+
+// only now load the errorHandler
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 5000
 
