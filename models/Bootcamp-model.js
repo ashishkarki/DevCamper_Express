@@ -17,7 +17,7 @@ const BootcampSchema = new mongoose.Schema({
     website: {
         type: String,
         match: [
-            /https?: \/\/ (www\.) ? [ -a - zA - Z0 - 9@:%._\+~#=]{ 1, 256 } \.[ a - zA - Z0 - 9() ]{ 1, 6 } \b([ -a - zA - Z0 - 9()@:% _\+.~# ?&//=]*)/,
+            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
             'Please enter a valid URL with Http or Https'
         ]
     },
@@ -28,7 +28,7 @@ const BootcampSchema = new mongoose.Schema({
     email: {
         type: String,
         match: [
-            '/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/'
+            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
             , 'Please enter a valid email ID' ]
     },
     address: {
@@ -40,11 +40,11 @@ const BootcampSchema = new mongoose.Schema({
         type: {
             type: String,
             enum: [ 'Point' ],
-            required: true,
+            //required: true,
         },
         coordindates: {
             type: [ Number ],
-            required: true,
+            //required: true,
             index: '2dsphere',
         },
         formattedAddress: String,

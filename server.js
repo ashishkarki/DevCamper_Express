@@ -14,9 +14,10 @@ connectDB()
 // bring in route files
 const bootcamps = require('./routes/bootcamps-routes')
 
-
-
 const app = express()
+
+// Body parser so content send in request is properly read
+app.use(express.json())
 
 // DEV logging middleware - only in dev environment
 if (process.env.NODE_ENV === 'development') {
