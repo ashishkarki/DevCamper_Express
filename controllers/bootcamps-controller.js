@@ -7,10 +7,34 @@ const asynHandler = require('../middleware/async')
 // @route GET /api/v1/bootcamps
 // @access Public
 exports.getBootcamps = asynHandler(async (req, res, next) => {
-    let queryStr = JSON.stringify(req.query).replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${ match }`)
-    console.log(queryStr)
+    // copy req.query
+    const reqQuery = { ...req.query }
 
-    const allBootcamps = await BootcampModel.find(JSON.parse(queryStr))
+    // fieldsd to exclude from mongo's filtering
+    const removeFields = [ 'select', 'sort' ]
+
+    // loop over removeFeilds and delete them from reqQuery
+    removeFields.forEach(param => delete reqQuery[ param ])
+
+    let queryStr = JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${ match }`)
+    // console.log(queryStr)
+
+    let mainQuery = BootcampModel.find(JSON.parse(queryStr))
+    // "select" fields
+    if (req.query.select) {
+        const fields = req.query.select.split(',').join(' ')
+        mainQuery = mainQuery.select(fields)
+    }
+
+    // "sort" fieldds
+    if (req.query.sort) {
+        const sortBy = req.query.sort.split(',').join(' ')
+        mainQuery = mainQuery.sort(sortBy)
+    } else {
+        mainQuery = mainQuery.sort('-createdAt') // minus means descending createdAt
+    }
+
+    const allBootcamps = await mainQuery
 
     res.status(200).json({
         success: true,
