@@ -11,7 +11,7 @@ exports.getBootcamps = asynHandler(async (req, res, next) => {
     const reqQuery = { ...req.query }
 
     // fieldsd to exclude from mongo's filtering
-    const removeFields = [ 'select', 'sort' ]
+    const removeFields = [ 'select', 'sort', 'page', 'limit' ]
 
     // loop over removeFeilds and delete them from reqQuery
     removeFields.forEach(param => delete reqQuery[ param ])
@@ -34,11 +34,37 @@ exports.getBootcamps = asynHandler(async (req, res, next) => {
         mainQuery = mainQuery.sort('-createdAt') // minus means descending createdAt
     }
 
+    // pagination
+    const page = parseInt(req.query.page, 10) || 1 // 10 base
+    const limit = parseInt(req.query.limit, 10) || 25
+    const startIndex = (page - 1) * limit
+    const endIndex = page * limit
+    const total = await BootcampModel.countDocuments()
+
+    mainQuery = mainQuery.skip(startIndex).limit(limit)
+
     const allBootcamps = await mainQuery
+
+    // paginamtion resuklt
+    const pagination = {}
+
+    if (endIndex < total) {
+        pagination.next = {
+            page: page + 1,
+            limit: limit
+        }
+    }
+    if (startIndex > 0) {
+        pagination.prev = {
+            page: page - 1,
+            limit
+        }
+    }
 
     res.status(200).json({
         success: true,
         count: allBootcamps.length,
+        pagination: pagination,
         data: allBootcamps,
     })
 
