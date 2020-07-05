@@ -3,6 +3,8 @@ const slugify = require('slugify')
 
 const geocoder = require('../utils/geocoder')
 
+const commonValues = require('../utils/common-values')
+
 const BootcampSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -130,5 +132,7 @@ BootcampSchema.pre('save', async function (next) {
     next()
 })
 
-
-module.exports = mongoose.model('Bootcamp', BootcampSchema)
+module.exports = mongoose.model(
+    commonValues.BOOTCAMP_MODEL_NAME,
+    BootcampSchema
+)
