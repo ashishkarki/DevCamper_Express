@@ -3,6 +3,7 @@ const asynHandler = require('../middleware/async')
 
 const CourseModel = require('../models/Course-model')
 const commonValues = require('../utils/common-values')
+const BootcampModel = require('../models/Bootcamp-model')
 
 // @description  Get all courses for a given bootcamp
 // @route GET /api/v1/courses
@@ -25,9 +26,49 @@ exports.getCourses = asynHandler(async (req, res, next) => {
     }
 
     const courses = await query
+
     res.status(200).json({
         success: true,
         count: courses.length,
         data: courses,
+    })
+})
+
+// @description  Get a single, specified course
+// @route GET /api/v1/courses/:id
+// @access Public
+exports.getCourse = asynHandler(async (req, res, next) => {
+    const course = await CourseModel.findById(req.params.id).populate({
+        path: commonValues.BOOTCAMP_REF_IN_COURSES,
+        select: 'name description'
+    })
+
+    if (!course) {
+        return next(new ErrorResponse(`No course with the id of ${ req.params.id } found`, 404))
+    }
+
+    res.status(200).json({
+        success: true,
+        data: course,
+    })
+})
+
+// @description add a course
+// @route POST /api/v1/bootcamps/:bootcampId/courses
+// @access Private
+exports.addCourse = asynHandler(async (req, res, next) => {
+    req.body[ commonValues.BOOTCAMP_REF_IN_COURSES ] = req.params[ commonValues.BOOTCAMP_ID_NAME ]
+
+    const bootcamp = await BootcampModel.findById(req.params[ commonValues.BOOTCAMP_ID_NAME ])
+
+    if (!bootcamp) {
+        return next(new ErrorResponse(`No Bootcamp with the id of ${ req.params[ commonValues.BOOTCAMP_ID_NAME ] } found`, 404))
+    }
+
+    const newCourse = await CourseModel.create(req.body)
+
+    res.status(200).json({
+        success: true,
+        data: newCourse,
     })
 })
