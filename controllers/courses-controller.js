@@ -10,28 +10,20 @@ const BootcampModel = require('../models/Bootcamp-model')
 // @route GET /api/v1/bootcamps/:bootcampId/courses
 // @access Public
 exports.getCourses = asynHandler(async (req, res, next) => {
-    let query
-
     if (req.params.bootcampId) {
         const findObj = {}
         findObj[ commonValues.BOOTCAMP_REF_IN_COURSES ] = req.params.bootcampId
 
-        query = CourseModel.find(findObj)
+        const courses = await CourseModel.find(findObj)
+
+        res.status(200).json({
+            success: true,
+            count: courses.length,
+            data: courses,
+        })
     } else {
-        query = CourseModel.find()//.populate('bootcamp')
-            .populate({
-                path: commonValues.BOOTCAMP_REF_IN_COURSES, // name from courses-schema
-                select: 'name description' // has to spaces here
-            })
+        res.status(200).json(res.advancedResults)
     }
-
-    const courses = await query
-
-    res.status(200).json({
-        success: true,
-        count: courses.length,
-        data: courses,
-    })
 })
 
 // @description  Get a single, specified course
