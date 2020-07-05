@@ -13,7 +13,8 @@ dotenv.config({ path: './config/config.env' })
 connectDB()
 
 // bring in route files
-const bootcamps = require('./routes/bootcamps-routes')
+const bootcampsRouter = require('./routes/bootcamps-routes')
+const coursesRouter = require('./routes/courses-routes')
 
 const app = express()
 
@@ -26,7 +27,8 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Mount routers
-app.use('/api/v1/bootcamps', bootcamps)
+app.use('/api/v1/bootcamps', bootcampsRouter)
+app.use('/api/v1/courses', coursesRouter)
 
 // only now load the errorHandler
 app.use(errorHandler)
