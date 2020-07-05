@@ -3,6 +3,8 @@ const geocoder = require('../utils/geocoder')
 const BootcampModel = require('../models/Bootcamp-model')
 const asynHandler = require('../middleware/async')
 
+const commonValues = require('../utils/common-values')
+
 // @description  Get all bootcamps
 // @route GET /api/v1/bootcamps
 // @access Public
@@ -17,9 +19,10 @@ exports.getBootcamps = asynHandler(async (req, res, next) => {
     removeFields.forEach(param => delete reqQuery[ param ])
 
     let queryStr = JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${ match }`)
-    // console.log(queryStr)
 
-    let mainQuery = BootcampModel.find(JSON.parse(queryStr))
+    // build the main-query to be executed
+    let mainQuery = BootcampModel.find(JSON.parse(queryStr)).populate(commonValues.COURSES_VIRTUAL_NAME)
+
     // "select" fields
     if (req.query.select) {
         const fields = req.query.select.split(',').join(' ')

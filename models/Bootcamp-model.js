@@ -99,6 +99,13 @@ const BootcampSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     }
+}, {
+    toJSON: {
+        virtuals: true,
+    },
+    toObject: {
+        virtuals: true,
+    }
 })
 
 // Create bootcamp slug from the name
@@ -130,6 +137,15 @@ BootcampSchema.pre('save', async function (next) {
     next()
 })
 
+// reverse populate with virtuals
+BootcampSchema.virtual(commonValues.COURSES_VIRTUAL_NAME, {
+    ref: commonValues.COURSE_MODEL_NAME,
+    localField: '_id',
+    foreignField: commonValues.BOOTCAMP_REF_IN_COURSES,
+    justOne: false, // we want more than one courses
+})
+
+// export module
 module.exports = mongoose.model(
     commonValues.BOOTCAMP_MODEL_NAME,
     BootcampSchema
