@@ -42,16 +42,14 @@ const BootcampSchema = new mongoose.Schema({
     },
     location: {
         // GeoJSON Point
-        // type: {
-        //     type: String,
-        //     enum: [ 'Point' ]
-        // },
-        // coordinates: {
-        //     type: [ { Number } ],
-        //     index: '2dsphere'
-        // },
-        type: { type: String, default: "Point" },
-        coordinates: [ Number ],
+        type: {
+            type: String,
+            enum: [ 'Point' ]
+        },
+        coordinates: {
+            type: [ Number ],
+            index: '2dsphere'
+        },
         formattedAddress: String,
         street: String,
         city: String,

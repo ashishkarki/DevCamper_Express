@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const commonValues = require('../utils/common-values')
 
-const CourseSchema = new mongoose.Schema({
+const schemaObject = {
     title: {
         type: String,
         trim: true,
@@ -32,13 +32,16 @@ const CourseSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    },
-    bootcamp: {
-        type: mongoose.Schema.ObjectId,
-        ref: commonValues.BOOTCAMP_MODEL_NAME,
-        required: true
     }
-})
+}
+
+schemaObject[ commonValues.BOOTCAMP_REF_IN_COURSES ] = {
+    type: mongoose.Schema.ObjectId,
+    ref: commonValues.BOOTCAMP_MODEL_NAME,
+    required: true
+}
+
+const CourseSchema = new mongoose.Schema(schemaObject)
 
 module.exports = mongoose.model(
     commonValues.COURSE_MODEL_NAME,
