@@ -128,11 +128,14 @@ exports.updateBootcamp = asynHandler(async (req, res, next) => {
 // @route DELETE /api/v1/bootcamps/:id
 // @access Private
 exports.deleteBootcamp = asynHandler(async (req, res, next) => {
-    const deletedBootcamp = await BootcampModel.findByIdAndDelete(req.params.id)
+    const deletedBootcamp = await BootcampModel.findById(req.params.id)
 
     if (!deletedBootcamp) {
         return next(new ErrorResponse(`Bootcamp not found with id of ${ req.params.id }`, 404))
     }
+
+    // using .remove() causes the "remove" pre to trigger in Bootcamp-model
+    deletedBootcamp.remove()
 
     res.status(200).json({
         success: true,
