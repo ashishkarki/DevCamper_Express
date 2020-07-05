@@ -1,5 +1,7 @@
 const express = require('express')
 
+const commonValues = require('../utils/common-values')
+
 const {
     getBootcamps,
     getBootcamp,
@@ -9,6 +11,10 @@ const {
     getBootcampsInRadius,
     bootcampPhotoUpload,
 } = require('../controllers/bootcamps-controller')
+
+const BootcampModel = require('../models/Bootcamp-model')
+
+const advancedResults = require('../middleware/advancedResults')
 
 // include other resource routers
 const coursesRouter = require('./courses-routes')
@@ -24,7 +30,13 @@ router.route('/radius/:zipcode/:distance')
     .get(getBootcampsInRadius)
 
 router.route('/')
-    .get(getBootcamps)
+    .get(
+        advancedResults(
+            BootcampModel,
+            commonValues.COURSES_VIRTUAL_NAME
+        ),
+        getBootcamps
+    )
     .post(createBootcamp)
 
 router.route('/:id')
