@@ -72,3 +72,42 @@ exports.addCourse = asynHandler(async (req, res, next) => {
         data: newCourse,
     })
 })
+
+// @description UPDATE a course
+// @route PUT /api/v1/courses/:id
+// @access Private
+exports.updateCourse = asynHandler(async (req, res, next) => {
+    let updatedCourse = await CourseModel.findById(req.params.id)
+
+    if (!updatedCourse) {
+        return next(new ErrorResponse(`No Course with the id of ${ req.params.id } found`, 404))
+    }
+
+    updatedCourse = await CourseModel.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+    })
+
+    res.status(200).json({
+        success: true,
+        data: updatedCourse,
+    })
+})
+
+// @description DELETE a course
+// @route DELETE /api/v1/courses/:id
+// @access Private
+exports.deleteCourse = asynHandler(async (req, res, next) => {
+    const deletedCourse = await CourseModel.findById(req.params.id)
+
+    if (!deletedCourse) {
+        return next(new ErrorResponse(`No Course with the id of ${ req.params.id } found`, 404))
+    }
+
+    await deletedCourse.remove()
+
+    res.status(200).json({
+        success: true,
+        data: {},
+    })
+})
