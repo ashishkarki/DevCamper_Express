@@ -43,6 +43,42 @@ schemaObject[ commonValues.BOOTCAMP_REF_IN_COURSES ] = {
 
 const CourseSchema = new mongoose.Schema(schemaObject)
 
+// Static method on CourseSchema to get avg of tuitions
+CourseSchema.statics.getAverageCost = async function (bootcampId) {
+    console.log('Calculating avg cost...'.blue)
+
+    const aggregateObj = await this.aggregate([
+        {
+            $match: { bootcamp: bootcampId }
+        },
+        {
+            $group: {
+                _id: '$bootcamp',
+                averageCost: { $avg: '$tuition' }
+            }
+        }
+    ])
+
+    try {
+        await this.model(commonValues.BOOTCAMP_MODEL_NAME).findByIdAndUpdate(bootcampId, {
+            averageCost: Math.ceil(aggregateObj[ 0 ].averageCost)
+        })
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+// Call getAverageCost after saving a course
+CourseSchema.post(('save'), function () {
+    this.constructor.getAverageCost(this.bootcamp)
+})
+
+// Call getAverageCost before removing a course
+CourseSchema.pre(('remove'), function () {
+    this.constructor.getAverageCost(this.bootcamp)
+})
+
+// expose course model
 module.exports = mongoose.model(
     commonValues.COURSE_MODEL_NAME,
     CourseSchema
