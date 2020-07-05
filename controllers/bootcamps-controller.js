@@ -2,6 +2,7 @@ const ErrorResponse = require('../utils/errorResponse')
 const geocoder = require('../utils/geocoder')
 const BootcampModel = require('../models/Bootcamp-model')
 const asynHandler = require('../middleware/async')
+const path = require('path')
 
 const commonValues = require('../utils/common-values')
 
@@ -167,5 +168,52 @@ exports.getBootcampsInRadius = asynHandler(async (req, res, next) => {
         success: true,
         count: bootcamps.length,
         data: bootcamps
+    })
+})
+
+// @description  Upload photo for bootcamp
+// @route PUT /api/v1/bootcamps/:id/photo
+// @access Private
+exports.bootcampPhotoUpload = asynHandler(async (req, res, next) => {
+    const bootcampToUploadPhoto = await BootcampModel.findById((req.params.id))
+
+    if (!bootcampToUploadPhoto) {
+        return next(new ErrorResponse(`Bootcamp not found with id of ${ req.params.id }`, 404))
+    }
+
+    if (!req.files) {
+        return next(new ErrorResponse('Please upload a file', 400))
+    }
+
+    const toBeUploadedFile = req.files.file
+
+    // make sure the image is a photo
+    if (!toBeUploadedFile.mimetype.startsWith('image')) {
+        return next(new ErrorResponse(`Please upload an image file`, 400))
+    }
+
+    //check file size
+    if (toBeUploadedFile.size > process.env.MAX_FILE_UPLOAD) {
+        return next(new ErrorResponse(`Please upload an image less than ${ process.env.MAX_FILE_UPLOAD } in size`, 400))
+    }
+
+    // Create custom filename so there is no overwriting
+    toBeUploadedFile.name = `photo_${ bootcampToUploadPhoto._id }${ path.parse(toBeUploadedFile.name).ext }`
+
+    // upload the file now
+    toBeUploadedFile.mv(`${ process.env.FILE_UPLOAD_PATH }/${ toBeUploadedFile.name }`, async err => {
+        if (err) {
+            console.error(err)
+            return next(
+                new ErrorResponse(`Problem with file upload`, 500)
+            )
+        }
+
+        await BootcampModel.findByIdAndUpdate(req.params.id, { photo: toBeUploadedFile.name })
+
+        res.status(200).json({
+            success: true,
+            data: toBeUploadedFile.name
+        })
     })
 })
