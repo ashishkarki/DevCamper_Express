@@ -17,6 +17,7 @@ connectDB()
 // bring in route files
 const bootcampsRouter = require('./routes/bootcamps-routes')
 const coursesRouter = require('./routes/courses-routes')
+const authRouter = require('./routes/auth-routes')
 
 const app = express()
 
@@ -37,6 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 // Mount routers
 app.use('/api/v1/bootcamps', bootcampsRouter)
 app.use('/api/v1/courses', coursesRouter)
+app.use('/api/v1/auth', authRouter)
 
 // only now load the errorHandler
 app.use(errorHandler)
