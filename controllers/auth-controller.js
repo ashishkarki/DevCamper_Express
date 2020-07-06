@@ -3,6 +3,7 @@ const asynHandler = require('../middleware/async')
 const UserModel = require('../models/User-model')
 
 const commonValues = require('../utils/common-values')
+const { response } = require('express')
 
 // @description  Register user
 // @route GET /api/v1/auth/register
@@ -18,5 +19,8 @@ exports.register = asynHandler(async (req, res, next) => {
         role,
     })
 
-    commonValues.responseBuilder(res, 200, true)
+    // Create a token - call this "method" on the object of UserModel which is "user" from above
+    const signedToken = user.getSignedJwtToken()
+
+    commonValues.responseBuilder({ response: res, returnStatus: 200, isSuccess: true, returnToken: signedToken })
 })
