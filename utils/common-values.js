@@ -7,7 +7,10 @@ exports.COURSES_VIRTUAL_NAME = 'courses'
 
 exports.USER_MODEL_NAME = 'User'
 
-exports.responseBuilder = ({ response, returnStatus, isSuccess, returnData, returnCount, returnToken }) => {
+exports.PROD_ENV_NAME = 'production'
+exports.DEV_ENV_NAME = 'development'
+
+exports.responseBuilder = ({ response, returnStatus, isSuccess, returnData, returnCount, returnToken, returnCookie }) => {
     if (!response) {
         return
     }
