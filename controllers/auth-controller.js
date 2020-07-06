@@ -73,3 +73,16 @@ const sendTokenResponse = (user, statusCode, response) => {
             token: signedToken
         })
 }
+
+// @description  Get currently logged in user
+// @route POST /api/v1/auth/me
+// @access Private
+exports.getMe = asynHandler(async (req, res, next) => {
+    const currentUserObj = await UserModel.findById(req.user.id)
+
+    commonValues.responseBuilder({
+        response: res,
+        isSuccess: true,
+        returnData: currentUserObj
+    })
+})
