@@ -55,6 +55,12 @@ UserSchema.methods.getSignedJwtToken = function () {
     return jwt.sign(payload, secret, options)
 }
 
+// Match user-entered, plain password to hashed password in DB
+UserSchema.methods.matchPasswords = async function (userEnteredPlainPw) {
+    // here this.password is the encrypted password stored by UserModel in the DB.
+    return await bcrypt.compare(userEnteredPlainPw, this.password)
+}
+
 // export the model
 module.exports = mongoose.model(
     commonValues.USER_MODEL_NAME,
