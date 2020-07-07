@@ -50,11 +50,17 @@ exports.getCourse = asynHandler(async (req, res, next) => {
 // @access Private
 exports.addCourse = asynHandler(async (req, res, next) => {
     req.body[ commonValues.BOOTCAMP_REF_IN_COURSES ] = req.params[ commonValues.BOOTCAMP_ID_NAME ]
+    req.body[ commonValues.USER_REF_IN_BOOTCAMP ] = req.user.id
 
     const bootcamp = await BootcampModel.findById(req.params[ commonValues.BOOTCAMP_ID_NAME ])
 
     if (!bootcamp) {
         return next(new ErrorResponse(`No Bootcamp with the id of ${ req.params[ commonValues.BOOTCAMP_ID_NAME ] } found`, 404))
+    }
+
+    // Make sure current user is the bootcamp owner
+    if (bootcamp.user.toString() !== req.user.id && req.user.role !== commonValues.ROLE_NAMES.ADMIN) {
+        return next(new ErrorResponse(`User with id ${ req.user.id } is not the owner or an admin and is not authorized to add/update/delete course to bootcamp with id ${ bootcamp._id }`, 401))
     }
 
     const newCourse = await CourseModel.create(req.body)
@@ -73,6 +79,11 @@ exports.updateCourse = asynHandler(async (req, res, next) => {
 
     if (!updatedCourse) {
         return next(new ErrorResponse(`No Course with the id of ${ req.params.id } found`, 404))
+    }
+
+    // Make sure current user is the course owner
+    if (updatedCourse.user.toString() !== req.user.id && req.user.role !== commonValues.ROLE_NAMES.ADMIN) {
+        return next(new ErrorResponse(`User with id ${ req.user.id } is not the owner or an admin and is not authorized to update course with id ${ updatedCourse._id }`, 401))
     }
 
     updatedCourse = await CourseModel.findByIdAndUpdate(req.params.id, req.body, {
@@ -94,6 +105,11 @@ exports.deleteCourse = asynHandler(async (req, res, next) => {
 
     if (!deletedCourse) {
         return next(new ErrorResponse(`No Course with the id of ${ req.params.id } found`, 404))
+    }
+
+    // Make sure current user is the course owner
+    if (deletedCourse.user.toString() !== req.user.id && req.user.role !== commonValues.ROLE_NAMES.ADMIN) {
+        return next(new ErrorResponse(`User with id ${ req.user.id } is not the owner or an admin and is not authorized to delete course with id ${ deletedCourse._id }`, 401))
     }
 
     await deletedCourse.remove()

@@ -41,6 +41,12 @@ schemaObject[ commonValues.BOOTCAMP_REF_IN_COURSES ] = {
     required: true
 }
 
+schemaObject[ commonValues.USER_REF_IN_BOOTCAMP ] = {
+    type: mongoose.Schema.ObjectId,
+    ref: commonValues.USER_MODEL_NAME,
+    required: true
+}
+
 const CourseSchema = new mongoose.Schema(schemaObject)
 
 // Static method on CourseSchema to get avg of tuitions
