@@ -5,7 +5,7 @@ const geocoder = require('../utils/geocoder')
 
 const commonValues = require('../utils/common-values')
 
-const BootcampSchema = new mongoose.Schema({
+const schemaObject = {
     name: {
         type: String,
         required: [ true, 'Please add a name' ],
@@ -98,15 +98,24 @@ const BootcampSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now,
-    }
-}, {
-    toJSON: {
-        virtuals: true,
     },
-    toObject: {
-        virtuals: true,
-    }
-})
+}
+
+schemaObject[ commonValues.USER_REF_IN_BOOTCAMP ] = {
+    type: mongoose.Schema.ObjectId,
+    ref: commonValues.USER_MODEL_NAME,
+    required: true
+}
+
+const virtualSchemaObject = {
+    toJSON: { virtuals: true, },
+    toObject: { virtuals: true, }
+}
+
+const BootcampSchema = new mongoose.Schema(
+    schemaObject,
+    virtualSchemaObject,
+)
 
 // Create bootcamp slug from the name
 BootcampSchema.pre('save', function (next) {

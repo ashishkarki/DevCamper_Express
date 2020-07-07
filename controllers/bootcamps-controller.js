@@ -34,6 +34,18 @@ exports.getBootcamp = asynHandler(async (req, res, next) => {
 // @route POST /api/v1/bootcamps
 // @access Private
 exports.createBootcamp = asynHandler(async (req, res, next) => {
+    // add user to req.body
+    req.body.user = req.user.id // assign the logged in user req.user
+
+    // find the bootcamp that this user has published
+    const findUserJson = {}
+    findUserJson[ commonValues.USER_REF_IN_BOOTCAMP ] = req.user.id
+    const publishedBootcamp = await BootcampModel.findOne(findUserJson)
+    // if the user is not an admin, they can only add one bootcamp else they can add any many as they want
+    if (publishedBootcamp && req.user.role !== commonValues.ROLE_NAMES.ADMIN) {
+        return next(new ErrorResponse(`The user with ID ${ req.user.id } has already published a bootcamp`, 400))
+    }
+
     const newBootcamp = await BootcampModel.create(req.body)
 
     res.status(201).json({
@@ -46,18 +58,23 @@ exports.createBootcamp = asynHandler(async (req, res, next) => {
 // @route PUT /api/v1/bootcamps/:id
 // @access Private
 exports.updateBootcamp = asynHandler(async (req, res, next) => {
-    const updatedBootcamp = await BootcampModel.findByIdAndUpdate(
+    let updatedBootcamp = await BootcampModel.findById(
         req.params.id,
-        req.body,
-        {
-            new: true,
-            runValidators: true,
-        }
     )
 
     if (!updatedBootcamp) {
         return next(new ErrorResponse(`Bootcamp not found with id of ${ req.params.id }`, 404))
     }
+
+    checkIfCorrectUser(updatedBootcamp, req)
+
+    updatedBootcamp = await BootcampModel.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {
+            new: true,
+            runValidators: true,
+        })
 
     res.status(200).json({
         success: true,
@@ -70,6 +87,8 @@ exports.updateBootcamp = asynHandler(async (req, res, next) => {
 // @access Private
 exports.deleteBootcamp = asynHandler(async (req, res, next) => {
     const deletedBootcamp = await BootcampModel.findById(req.params.id)
+
+    checkIfCorrectUser(deletedBootcamp, req)
 
     if (!deletedBootcamp) {
         return next(new ErrorResponse(`Bootcamp not found with id of ${ req.params.id }`, 404))
@@ -121,6 +140,8 @@ exports.bootcampPhotoUpload = asynHandler(async (req, res, next) => {
         return next(new ErrorResponse(`Bootcamp not found with id of ${ req.params.id }`, 404))
     }
 
+    checkIfCorrectUser(bootcampToUploadPhoto, req)
+
     if (!req.files) {
         return next(new ErrorResponse('Please upload a file', 400))
     }
@@ -157,3 +178,10 @@ exports.bootcampPhotoUpload = asynHandler(async (req, res, next) => {
         })
     })
 })
+
+checkIfCorrectUser = (bootcamp, req) => {
+    // Make sure current user is the bootcamp owner
+    if (bootcamp.user.toString() !== req.user.id && req.user.role !== commonValues.ROLE_NAMES.ADMIN) {
+        return next(new ErrorResponse(`User with id ${ req.params.id } is not the owner or an admin and is not allowed to update this bootcamp`, 401))
+    }
+}

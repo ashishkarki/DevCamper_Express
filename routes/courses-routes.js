@@ -26,11 +26,11 @@ router.route('/')
         path: commonValues.BOOTCAMP_REF_IN_COURSES, // name from courses-schema
         select: 'name description' // has to spaces here
     }), getCourses)
-    .post(protect, authorize('publisher', 'admin'), addCourse)
+    .post(protect, authorize(commonValues.ROLE_NAMES.PUBLISHER, commonValues.ROLE_NAMES.ADMIN), addCourse)
 
 router.route('/:id')
     .get(getCourse)
-    .put(protect, authorize('publisher', 'admin'), updateCourse)
-    .delete(protect, authorize('publisher', 'admin'), deleteCourse)
+    .put(protect, authorize(commonValues.ROLE_NAMES.PUBLISHER, commonValues.ROLE_NAMES.ADMIN), updateCourse)
+    .delete(protect, authorize(commonValues.ROLE_NAMES.PUBLISHER, commonValues.ROLE_NAMES.ADMIN), deleteCourse)
 
 module.exports = router

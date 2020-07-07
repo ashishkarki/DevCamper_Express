@@ -39,14 +39,14 @@ router.route('/')
         ),
         getBootcamps
     )
-    .post(protect, authorize('publisher', 'admin'), createBootcamp)
+    .post(protect, authorize(commonValues.ROLE_NAMES.PUBLISHER, commonValues.ROLE_NAMES.ADMIN), createBootcamp)
 
 router.route('/:id')
     .get(getBootcamp)
-    .put(protect, authorize('publisher', 'admin'), updateBootcamp)
-    .delete(protect, authorize('publisher', 'admin'), deleteBootcamp)
+    .put(protect, authorize(commonValues.ROLE_NAMES.PUBLISHER, commonValues.ROLE_NAMES.ADMIN), updateBootcamp)
+    .delete(protect, authorize(commonValues.ROLE_NAMES.PUBLISHER, commonValues.ROLE_NAMES.ADMIN), deleteBootcamp)
 
 router.route('/:id/photo')
-    .put(protect, authorize('publisher', 'admin'), bootcampPhotoUpload)
+    .put(protect, authorize(commonValues.ROLE_NAMES.PUBLISHER, commonValues.ROLE_NAMES.ADMIN), bootcampPhotoUpload)
 
 module.exports = router
