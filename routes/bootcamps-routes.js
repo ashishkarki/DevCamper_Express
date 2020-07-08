@@ -18,6 +18,7 @@ const advancedResults = require('../middleware/advancedResults')
 
 // include other resource routers
 const coursesRouter = require('./courses-routes')
+const reviewsRouter = require('./reviews-routes')
 
 // define the bootcamps router
 const router = express.Router()
@@ -26,6 +27,7 @@ const { protect, authorize } = require('../middleware/auth-middleware')
 
 // Re-route into other resource routers
 router.use('/:bootcampId/courses', coursesRouter)
+router.use(`/:${ commonValues.BOOTCAMP_ID_NAME }/reviews`, reviewsRouter)
 
 // bootcamps's routes
 router.route('/radius/:zipcode/:distance')
