@@ -1,0 +1,40 @@
+{
+  "name": "devcamper_express",
+  "version": "1.0.0",
+  "description": "devcamper backend api using express, mongo etc",
+  "main": "server.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node server",
+    "dev": "nodemon server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "mongo",
+    "project"
+  ],
+  "author": "ashish karki",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.7-alpha.3",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.21",
+    "morgan": "^1.10.0",
+    "node-geocoder": "^3.27.0",
+    "nodemailer": "^6.4.10",
+    "slugify": "^1.4.4"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2",
+    "nodemon": "^2.0.4"
+  },
+  "comments": {
+    "cross-env": "https://stackoverflow.com/questions/11928013/node-env-is-not-recognized-as-an-internal-or-external-command-operable-comman"
+  }
+}
