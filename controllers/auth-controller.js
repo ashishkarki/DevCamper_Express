@@ -1,9 +1,12 @@
+const crypto = require('crypto')
+
 const ErrorResponse = require('../utils/errorResponse')
 const asynHandler = require('../middleware/async')
 const UserModel = require('../models/User-model')
 
 const commonValues = require('../utils/common-values')
 const { response } = require('express')
+const sendEmail = require('../utils/send-email')
 
 // @description  Register user
 // @route POST /api/v1/auth/register
@@ -49,6 +52,99 @@ exports.login = asynHandler(async (req, res, next) => {
     sendTokenResponse(user, 200, res)
 })
 
+// @description  Get currently logged in user
+// @route POST /api/v1/auth/me
+// @access Private
+exports.getMe = asynHandler(async (req, res, next) => {
+    const currentUserObj = await UserModel.findById(req.user.id)
+
+    commonValues.responseBuilder({
+        response: res,
+        isSuccess: true,
+        returnData: currentUserObj
+    })
+})
+
+// @description  Forgot password
+// @route POST /api/v1/auth/forgotpassword
+// @access Public
+exports.forgotPassword = asynHandler(async (req, res, next) => {
+    const currentUserObj = await UserModel.findOne({ email: req.body.email })
+
+    if (!currentUserObj) {
+        return next(new ErrorResponse(`There is no user with that email ID`, 404))
+    }
+
+    // get reset token
+    const resetToken = await currentUserObj.getResetPasswordToken()
+
+    await currentUserObj.save({ validateBeforeSave: false })
+
+    // Create reset url
+    const resetUrl = `${ req.protocol }://${ req.get('host') }/api/v1/auth/resetpassword/${ resetToken }`
+
+    const message = `You are receiving this email because your or someone else has requested the reset of a password. Please make a PUT request to: \n\n ${ resetUrl }`
+
+    try {
+        await sendEmail({
+            email: currentUserObj.email,
+            subject: 'Password reset token',
+            message
+        })
+
+        res
+            .status(200)
+            .json({
+                success: true,
+                data: 'Email sent'
+            })
+    } catch (error) {
+        currentUserObj.resetPasswordToken = undefined
+        currentUserObj.resetPasswordExpire = undefined
+
+        await currentUserObj.save(({ validateBeforeSave: false }))
+
+        return next(new ErrorResponse('Reset email could not be sent', 500))
+    }
+
+    commonValues.responseBuilder({
+        response: res,
+        isSuccess: true,
+        returnData: currentUserObj
+    })
+})
+
+// @description  Reset the password
+// @route PUT /api/v1/auth/resetpassword/:resettoken
+// @access Public
+exports.resetPassword = asynHandler(async (req, res, next) => {
+    // get hashed token
+    const resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(req.params.resettoken)
+        .digest('hex')
+
+    const currentUserObj = await UserModel.findOne({
+        resetPasswordToken: resetPasswordToken,
+        resetPasswordExpire: { $gt: Date.now() }
+    })
+
+    if (!currentUserObj) {
+        return next(new ErrorResponse('Invalid token', 400))
+    }
+
+    // if token is good, set the new password
+    currentUserObj.password = req.body.password
+
+    // clear out the reset.. fields and save the user obj. to DB
+    currentUserObj.resetPasswordToken = undefined
+    currentUserObj.resetPasswordExpire = undefined
+    await currentUserObj.save()
+
+    sendTokenResponse(currentUserObj, 200, res)
+})
+
+
 // Get token from model and also create a cookie and send the response
 const sendTokenResponse = (user, statusCode, response) => {
     // Create a token - call this "method" on the object of UserModel which is "user" from above
@@ -73,16 +169,3 @@ const sendTokenResponse = (user, statusCode, response) => {
             token: signedToken
         })
 }
-
-// @description  Get currently logged in user
-// @route POST /api/v1/auth/me
-// @access Private
-exports.getMe = asynHandler(async (req, res, next) => {
-    const currentUserObj = await UserModel.findById(req.user.id)
-
-    commonValues.responseBuilder({
-        response: res,
-        isSuccess: true,
-        returnData: currentUserObj
-    })
-})

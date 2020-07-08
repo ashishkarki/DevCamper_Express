@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 
 const commonValues = require('../utils/common-values')
@@ -38,6 +39,10 @@ const UserSchema = new mongoose.Schema({
 
 // Encrypt password using bcryptjs
 UserSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        next()
+    }
+
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
 })
@@ -59,6 +64,22 @@ UserSchema.methods.getSignedJwtToken = function () {
 UserSchema.methods.matchPasswords = async function (userEnteredPlainPw) {
     // here this.password is the encrypted password stored by UserModel in the DB.
     return await bcrypt.compare(userEnteredPlainPw, this.password)
+}
+
+// generate and hash password token
+UserSchema.methods.getResetPasswordToken = async function () {
+    // generate the token
+    const resetToken = crypto.randomBytes(20).toString('hex')
+
+    // Hash token and set to resetPasswordToekn field
+    this.resetPasswordToken = crypto.createHash('sha256')
+        .update(resetToken)
+        .digest('hex') // output as hex string
+
+    // set the expiry time
+    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000
+
+    return resetToken // return the original hash token
 }
 
 // export the model
