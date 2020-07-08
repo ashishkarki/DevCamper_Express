@@ -10,6 +10,7 @@ dotenv.config({ path: './config/config.env' })
 const Bootcamp_model = require('./models/Bootcamp-model')
 const Course_model = require('./models/Course-model')
 const User_model = require('./models/User-model')
+const Review_model = require('./models/Review-model')
 
 // connect to DB
 mongoose.connect(process.env.MONGO_URI, {
@@ -23,6 +24,7 @@ mongoose.connect(process.env.MONGO_URI, {
 const bootcamps = JSON.parse(fs.readFileSync(`${ __dirname }/_data/bootcamps.json`, 'utf-8'))
 const courses = JSON.parse(fs.readFileSync(`${ __dirname }/_data/courses.json`, 'utf-8'))
 const users = JSON.parse(fs.readFileSync(`${ __dirname }/_data/users.json`, 'utf-8'))
+const reviews = JSON.parse(fs.readFileSync(`${ __dirname }/_data/reviews.json`, 'utf-8'))
 
 // import bootcamps above into DB
 const importData = async () => {
@@ -30,6 +32,7 @@ const importData = async () => {
         await Bootcamp_model.create(bootcamps)
         await Course_model.create(courses)
         await User_model.create(users)
+        await Review_model.create(reviews)
 
         console.log(`Data imported...`.green.inverse)
         process.exit()
@@ -44,6 +47,7 @@ const deleteData = async () => {
         await Bootcamp_model.deleteMany() // delete everything
         await Course_model.deleteMany()
         await User_model.deleteMany()
+        await Review_model.deleteMany()
 
         console.log(`Data Deleted...`.red.inverse)
         process.exit()

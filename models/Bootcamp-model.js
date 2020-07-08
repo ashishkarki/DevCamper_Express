@@ -101,7 +101,7 @@ const schemaObject = {
     },
 }
 
-schemaObject[ commonValues.USER_REF_IN_BOOTCAMP ] = {
+schemaObject[ commonValues.USER_REF_ELSEWHERE ] = {
     type: mongoose.Schema.ObjectId,
     ref: commonValues.USER_MODEL_NAME,
     required: true
@@ -150,7 +150,7 @@ BootcampSchema.pre('save', async function (next) {
 BootcampSchema.pre('remove', async function (next) {
     console.log(`Courses being removed from bootcamp with id ${ this._id }`)
     const deleteObj = {}
-    deleteObj[ commonValues.BOOTCAMP_REF_IN_COURSES ] = this._id
+    deleteObj[ commonValues.BOOTCAMP_REF_ELSEWHERE ] = this._id
 
     await this.model(commonValues.COURSE_MODEL_NAME).deleteMany(deleteObj)
 
@@ -161,7 +161,7 @@ BootcampSchema.pre('remove', async function (next) {
 BootcampSchema.virtual(commonValues.COURSES_VIRTUAL_NAME, {
     ref: commonValues.COURSE_MODEL_NAME,
     localField: '_id',
-    foreignField: commonValues.BOOTCAMP_REF_IN_COURSES,
+    foreignField: commonValues.BOOTCAMP_REF_ELSEWHERE,
     justOne: false, // we want more than one courses
 })
 

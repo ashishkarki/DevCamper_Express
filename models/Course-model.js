@@ -35,13 +35,13 @@ const schemaObject = {
     }
 }
 
-schemaObject[ commonValues.BOOTCAMP_REF_IN_COURSES ] = {
+schemaObject[ commonValues.BOOTCAMP_REF_ELSEWHERE ] = {
     type: mongoose.Schema.ObjectId,
     ref: commonValues.BOOTCAMP_MODEL_NAME,
     required: true
 }
 
-schemaObject[ commonValues.USER_REF_IN_BOOTCAMP ] = {
+schemaObject[ commonValues.USER_REF_ELSEWHERE ] = {
     type: mongoose.Schema.ObjectId,
     ref: commonValues.USER_MODEL_NAME,
     required: true

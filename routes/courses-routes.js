@@ -23,7 +23,7 @@ const { protect, authorize } = require('../middleware/auth-middleware')
 // courses routes
 router.route('/')
     .get(advancedResults(CourseModel, {
-        path: commonValues.BOOTCAMP_REF_IN_COURSES, // name from courses-schema
+        path: commonValues.BOOTCAMP_REF_ELSEWHERE, // name from courses-schema
         select: 'name description' // has to spaces here
     }), getCourses)
     .post(protect, authorize(commonValues.ROLE_NAMES.PUBLISHER, commonValues.ROLE_NAMES.ADMIN), addCourse)

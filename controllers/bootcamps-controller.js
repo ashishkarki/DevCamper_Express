@@ -39,7 +39,7 @@ exports.createBootcamp = asynHandler(async (req, res, next) => {
 
     // find the bootcamp that this user has published
     const findUserJson = {}
-    findUserJson[ commonValues.USER_REF_IN_BOOTCAMP ] = req.user.id
+    findUserJson[ commonValues.USER_REF_ELSEWHERE ] = req.user.id
     const publishedBootcamp = await BootcampModel.findOne(findUserJson)
     // if the user is not an admin, they can only add one bootcamp else they can add any many as they want
     if (publishedBootcamp && req.user.role !== commonValues.ROLE_NAMES.ADMIN) {

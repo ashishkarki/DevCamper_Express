@@ -27,7 +27,7 @@ const { protect, authorize } = require('../middleware/auth-middleware')
 
 // Re-route into other resource routers
 router.use('/:bootcampId/courses', coursesRouter)
-router.use(`/:${ commonValues.BOOTCAMP_ID_NAME }/reviews`, reviewsRouter)
+router.use(`/:bootcampId/reviews`, reviewsRouter)
 
 // bootcamps's routes
 router.route('/radius/:zipcode/:distance')

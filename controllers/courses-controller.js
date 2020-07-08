@@ -12,7 +12,7 @@ const BootcampModel = require('../models/Bootcamp-model')
 exports.getCourses = asynHandler(async (req, res, next) => {
     if (req.params.bootcampId) {
         const findObj = {}
-        findObj[ commonValues.BOOTCAMP_REF_IN_COURSES ] = req.params.bootcampId
+        findObj[ commonValues.BOOTCAMP_REF_ELSEWHERE ] = req.params.bootcampId
 
         const courses = await CourseModel.find(findObj)
 
@@ -31,7 +31,7 @@ exports.getCourses = asynHandler(async (req, res, next) => {
 // @access Public
 exports.getCourse = asynHandler(async (req, res, next) => {
     const course = await CourseModel.findById(req.params.id).populate({
-        path: commonValues.BOOTCAMP_REF_IN_COURSES,
+        path: commonValues.BOOTCAMP_REF_ELSEWHERE,
         select: 'name description'
     })
 
@@ -49,8 +49,8 @@ exports.getCourse = asynHandler(async (req, res, next) => {
 // @route POST /api/v1/bootcamps/:bootcampId/courses
 // @access Private
 exports.addCourse = asynHandler(async (req, res, next) => {
-    req.body[ commonValues.BOOTCAMP_REF_IN_COURSES ] = req.params[ commonValues.BOOTCAMP_ID_NAME ]
-    req.body[ commonValues.USER_REF_IN_BOOTCAMP ] = req.user.id
+    req.body[ commonValues.BOOTCAMP_REF_ELSEWHERE ] = req.params[ commonValues.BOOTCAMP_ID_NAME ]
+    req.body[ commonValues.USER_REF_ELSEWHERE ] = req.user.id
 
     const bootcamp = await BootcampModel.findById(req.params[ commonValues.BOOTCAMP_ID_NAME ])
 
