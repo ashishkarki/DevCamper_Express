@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser')
 const path = require('path')
 const errorHandler = require('./middleware/error')
 const mongoSanitize = require('express-mongo-sanitize')
+const helmet = require('helmet')
 
 const dotenv = require('dotenv')
 const connectDB = require('./config/db')
@@ -44,6 +45,9 @@ app.use(mongoSanitize())
 
 // set static folders
 app.use(express.static(path.join(__dirname, 'public')))
+
+// add helmet to add safety headers
+app.use(helmet())
 
 // Mount routers
 app.use('/api/v1/bootcamps', bootcampsRouter)
