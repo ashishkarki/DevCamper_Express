@@ -20,6 +20,7 @@ const bootcampsRouter = require('./routes/bootcamps-routes')
 const coursesRouter = require('./routes/courses-routes')
 const authRouter = require('./routes/auth-routes')
 const usersRouter = require('./routes/users-routes')
+const reviewsRouter = require('./routes/reviews-routes')
 
 const app = express()
 
@@ -45,6 +46,7 @@ app.use('/api/v1/bootcamps', bootcampsRouter)
 app.use('/api/v1/courses', coursesRouter)
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/users', usersRouter)
+app.use('/api/v1/reviews', reviewsRouter)
 
 // only now load the errorHandler
 app.use(errorHandler)
