@@ -8,6 +8,8 @@ const errorHandler = require('./middleware/error')
 const mongoSanitize = require('express-mongo-sanitize')
 const helmet = require('helmet')
 const xss = require('xss-clean')
+const rateLimit = require("express-rate-limit")
+const hpp = require('hpp')
 
 const dotenv = require('dotenv')
 const connectDB = require('./config/db')
@@ -46,6 +48,16 @@ app.use(mongoSanitize())
 
 // more sanitizing of parms, urls i.e prevents XSS attacks
 app.use(xss())
+
+// rate limiting
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 mins
+    max: 100,
+})
+app.use(limiter)
+
+// prevent http param pollution
+app.use(hpp())
 
 // set static folders
 app.use(express.static(path.join(__dirname, 'public')))
