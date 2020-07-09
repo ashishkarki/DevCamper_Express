@@ -4,6 +4,8 @@ const {
     getReviews,
     getReview,
     addReview,
+    updateReview,
+    deleteReview,
 } = require('../controllers/reviews-controller')
 
 const commonValues = require('../utils/common-values')
@@ -26,11 +28,30 @@ router.route('/')
     }), getReviews)
     .post(
         protect,
-        authorize(commonValues.ROLE_NAMES.ADMIN, commonValues.ROLE_NAMES.USER),
+        authorize(
+            commonValues.ROLE_NAMES.ADMIN,
+            commonValues.ROLE_NAMES.USER
+        ),
         addReview
     )
 
 router.route('/:id')
     .get(getReview)
+    .put(
+        protect,
+        authorize(
+            commonValues.ROLE_NAMES.ADMIN,
+            commonValues.ROLE_NAMES.USER
+        ),
+        updateReview,
+    )
+    .delete(
+        protect,
+        authorize(
+            commonValues.ROLE_NAMES.ADMIN,
+            commonValues.ROLE_NAMES.USER
+        ),
+        deleteReview,
+    )
 
 module.exports = router

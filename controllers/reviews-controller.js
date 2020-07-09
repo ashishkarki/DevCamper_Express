@@ -60,7 +60,7 @@ exports.addReview = asynHandler(async (req, res, next) => {
     const bootcampToAddReview = await BootcampModel.findById(req.params[ commonValues.BOOTCAMP_ID_NAME ])
 
     if (!bootcampToAddReview) {
-        return next(ErrorResponse(`No bootcamp with id of ${ req.params[ commonValues.BOOTCAMP_ID_NAME ] }`))
+        return next(ErrorResponse(`No bootcamp with id of ${ req.params[ commonValues.BOOTCAMP_ID_NAME ] }`, 404))
     }
 
     const reviewToAdd = await ReviewModel.create(req.body)
@@ -68,5 +68,54 @@ exports.addReview = asynHandler(async (req, res, next) => {
     res.status(201).json({
         success: true,
         data: reviewToAdd,
+    })
+})
+
+// @description  Update a reivew
+// @route PUT /api/v1/reviews/:id
+// @access Private
+exports.updateReview = asynHandler(async (req, res, next) => {
+    const toUpdateReview = await ReviewModel.findById(req.params.id)
+
+    if (!toUpdateReview) {
+        return next(ErrorResponse(`No Review with id of ${ req.params.id }`, 404))
+    }
+
+    // make sure this review belongs to current user or is an admin
+    if (toUpdateReview.user.toString() !== req.user.id && req.user.role !== commonValues.ROLE_NAMES.ADMIN) {
+        return next(new ErrorResponse(`Not Authorized to update this review`, 401))
+    }
+
+    const updatedReview = await ReviewModel.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+    })
+
+    res.status(200).json({
+        success: true,
+        data: updatedReview,
+    })
+})
+
+// @description  DELETE a reivew
+// @route DELETE /api/v1/reviews/:id
+// @access Private
+exports.deleteReview = asynHandler(async (req, res, next) => {
+    const toDeleteReview = await ReviewModel.findById(req.params.id)
+
+    if (!toDeleteReview) {
+        return next(ErrorResponse(`No Review with id of ${ req.params.id }`, 404))
+    }
+
+    // make sure this review belongs to current user or is an admin
+    if (toDeleteReview.user.toString() !== req.user.id && req.user.role !== commonValues.ROLE_NAMES.ADMIN) {
+        return next(new ErrorResponse(`Not Authorized to update this review`, 401))
+    }
+
+    await toDeleteReview.remove()
+
+    res.status(200).json({
+        success: true,
+        data: {},
     })
 })
