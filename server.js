@@ -7,6 +7,7 @@ const path = require('path')
 const errorHandler = require('./middleware/error')
 const mongoSanitize = require('express-mongo-sanitize')
 const helmet = require('helmet')
+const xss = require('xss-clean')
 
 const dotenv = require('dotenv')
 const connectDB = require('./config/db')
@@ -42,6 +43,9 @@ app.use(fileUpload())
 
 // sanitize our data like URLs, param etc
 app.use(mongoSanitize())
+
+// more sanitizing of parms, urls i.e prevents XSS attacks
+app.use(xss())
 
 // set static folders
 app.use(express.static(path.join(__dirname, 'public')))
