@@ -5,6 +5,12 @@ const fileUpload = require('express-fileupload')
 const cookieParser = require('cookie-parser')
 const path = require('path')
 const errorHandler = require('./middleware/error')
+const mongoSanitize = require('express-mongo-sanitize')
+const helmet = require('helmet')
+const xss = require('xss-clean')
+const rateLimit = require('express-rate-limit')
+const hpp = require('hpp')
+const cors = require('cors')
 
 const dotenv = require('dotenv')
 const connectDB = require('./config/db')
@@ -38,8 +44,30 @@ if (process.env.NODE_ENV === 'development') {
 // File uploading
 app.use(fileUpload())
 
+// sanitize our data like URLs, param etc
+app.use(mongoSanitize())
+
+// more sanitizing of parms, urls i.e prevents XSS attacks
+app.use(xss())
+
+// rate limiting
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 mins
+    max: 100,
+})
+app.use(limiter)
+
+// prevent http param pollution
+app.use(hpp())
+
+// Enable CORS
+app.use(cors())
+
 // set static folders
 app.use(express.static(path.join(__dirname, 'public')))
+
+// add helmet to add safety headers
+app.use(helmet())
 
 // Mount routers
 app.use('/api/v1/bootcamps', bootcampsRouter)
