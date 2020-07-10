@@ -1,6 +1,6 @@
 # Devcamper - Express based API
 
-> Backend API for the DevCamper-Express application which is a bootcamp directory webservice
+> Backend API for the DevCamper-Express application which is a bootcamp directory webservice. Currently deployed with DigitalOcean and viewed at http://164.90.191.215/.
 
 ## Usage
 
